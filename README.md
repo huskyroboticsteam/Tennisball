@@ -1,10 +1,7 @@
 # Tennisball
-## Code for tennis ball detection
+## Code for tennis ball detection (Work in progress)
 
-
-## Work in progress
-
-## Compiling
+### Compiling
 1. Enter the project directory
 2. Run `cmake .`
 3. Run `make`
