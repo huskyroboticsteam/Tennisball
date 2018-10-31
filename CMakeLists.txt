@@ -3,5 +3,5 @@ project (tennisball)
 
 find_package( OpenCV REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
-add_executable( tennisball tennisball.cpp )
-target_link_libraries( tennisball ${OpenCV_LIBS} )
+add_executable( live live_video.cpp )
+target_link_libraries( live ${OpenCV_LIBS} )
