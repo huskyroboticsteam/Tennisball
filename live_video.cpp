@@ -12,9 +12,11 @@ String regularTitle = "Live";
 
 int lowH, lowS, lowV;
 int highH, highS, highV;
+int blurStrength=0;
 
 const int maxHue = 180;
 const int maxVal = 255;
+const int maxBlur = 50;
 
 void show(Mat image);
 void showGray(Mat image);
@@ -66,6 +68,7 @@ int main(int, char**)
 
         if(!setup){
           setupTrackbars(filteredTitle);
+          createTrackbar("Blur",regularTitle,&blurStrength,maxBlur);
           setup = true;
         }
 
@@ -77,6 +80,7 @@ int main(int, char**)
 }
 
 void show(Mat image){
+  GaussianBlur(image,image,Size(blurStrength*2+1,blurStrength*2+1),0,0);
   imshow(regularTitle,image);
 }
 
@@ -109,8 +113,8 @@ Mat threshold_image(Mat img)
   Mat hsv(img.rows, img.cols, CV_8UC3);
   cvtColor(img, hsv, CV_RGB2HSV);
   Mat thresh(img.rows, img.cols, CV_8UC1);
-  Scalar high_HSV(lowH,64,16);
-  Scalar low_HSV(highH,255,255);
+  Scalar high_HSV(lowH,lowS,lowV);
+  Scalar low_HSV(highH,highS,highV);
   inRange(hsv, high_HSV, low_HSV, thresh);
   return(thresh);
 }
@@ -133,7 +137,28 @@ void onHighHueChange(int newVal, void* userdata){
   
 }
 
+void onLowSatChange(int newVal, void* userdata){
+  
+}
+
+void onHighSatChange(int newVal, void* userdata){
+  
+}
+
+void onLowValChange(int newVal, void* userdata){
+  
+}
+
+void onHighValChange(int newVal, void* userdata){
+  
+}
+
 void setupTrackbars(String windowName){
   createTrackbar("Hue Low",windowName,&lowH,maxHue,onLowHueChange);
   createTrackbar("Hue High",windowName,&highH,maxHue,onHighHueChange);
+  createTrackbar("Sat Low",windowName,&lowS,maxVal,onLowSatChange);
+  createTrackbar("Sat High",windowName,&highS,maxVal,onHighSatChange);
+  createTrackbar("Val Low",windowName,&lowV,maxVal,onLowValChange);
+  createTrackbar("Val High",windowName,&highV,maxVal,onHighValChange);
 }
+
