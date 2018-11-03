@@ -7,8 +7,77 @@
 using namespace cv;
 using namespace std;
 
+String filteredTitle = "Live (Filtered)";
+String regularTitle = "Live";
+
+int lowH, lowS, lowV;
+int highH, highS, highV;
+
+const int maxHue = 180;
+const int maxVal = 255;
+
+void show(Mat image);
+void showGray(Mat image);
+void showBGR(Mat image);
+Mat morphed_img(Mat mask);
+Mat threshold_image(Mat img);
+void showFiltered(Mat image, bool morph);
+void setupTrackbars(String windowName);
+
+
+int main(int, char**)
+{
+    Mat frame;
+    //--- INITIALIZE VIDEOCAPTURE
+    VideoCapture cap;
+    // open the default camera using default API
+    // cap.open(0);
+    // OR advance usage: select any API backend
+    int deviceID = 0;             // 0 = open default camera
+    int apiID = cv::CAP_ANY;      // 0 = autodetect default API
+    // open selected camera using selected API
+    cap.open(deviceID + apiID);
+    // check if we succeeded
+    if (!cap.isOpened()) {
+        cerr << "ERROR! Unable to open camera\n";
+        return -1;
+    }
+    //--- GRAB AND WRITE LOOP
+    cout << "Start grabbing" << endl
+        << "Press any key to terminate" << endl;
+    bool setup = false;
+    while(true)
+    {
+        // wait for a new frame from camera and store it into 'frame'
+        cap.read(frame);
+        // check if we succeeded
+        if (frame.empty()) {
+            cerr << "ERROR! blank frame grabbed\n";
+            break;
+        }
+
+        show(frame);
+
+        //showGray(frame);
+
+        //showBGR(frame);
+        
+        showFiltered(frame,false);
+
+        if(!setup){
+          setupTrackbars(filteredTitle);
+          setup = true;
+        }
+
+        if (waitKey(5) >= 0)
+            break;
+    }
+    // the camera will be deinitialized automatically in VideoCapture destructor
+    return 0;
+}
+
 void show(Mat image){
-  imshow("Live (Original)",image);
+  imshow(regularTitle,image);
 }
 
 void showGray(Mat image){
@@ -32,7 +101,7 @@ Mat morphed_img(Mat mask)
   morphologyEx(mask, mask, MORPH_OPEN, se11);
 
   GaussianBlur(mask, mask, Size(15, 15), 0, 0);
-  return(mask);   
+  return(mask);
 }
 
 Mat threshold_image(Mat img)
@@ -40,8 +109,8 @@ Mat threshold_image(Mat img)
   Mat hsv(img.rows, img.cols, CV_8UC3);
   cvtColor(img, hsv, CV_RGB2HSV);
   Mat thresh(img.rows, img.cols, CV_8UC1);
-  Scalar high_HSV(127,64,16);
-  Scalar low_HSV(146,255,255);
+  Scalar high_HSV(lowH,64,16);
+  Scalar low_HSV(highH,255,255);
   inRange(hsv, high_HSV, low_HSV, thresh);
   return(thresh);
 }
@@ -49,60 +118,22 @@ Mat threshold_image(Mat img)
 void showFiltered(Mat image, bool morph){
   Mat mask = threshold_image(image);
   if(morph){
-  Mat filtered = morphed_img(mask);
-  imshow("Live (Filtered)",filtered);
-  }
-  else{
-    imshow("Live (Filtered)",mask);
+    Mat filtered = morphed_img(mask);
+    imshow(filteredTitle,filtered);
+  } else{
+    imshow(filteredTitle,mask);
   }
 }
 
-int lowH, lowS, lowV;
-int highH, highS, highV;
+void onLowHueChange(int newVal, void* userdata){
+  //printf("%d\n",lowH);
+}
 
+void onHighHueChange(int newVal, void* userdata){
+  
+}
 
-
-int main(int, char**)
-{
-    Mat frame;
-    //--- INITIALIZE VIDEOCAPTURE
-    VideoCapture cap;
-    // open the default camera using default API
-    // cap.open(0);
-    // OR advance usage: select any API backend
-    int deviceID = 0;             // 0 = open default camera
-    int apiID = cv::CAP_ANY;      // 0 = autodetect default API
-    // open selected camera using selected API
-    cap.open(deviceID + apiID);
-    // check if we succeeded
-    if (!cap.isOpened()) {
-        cerr << "ERROR! Unable to open camera\n";
-        return -1;
-    }
-    //--- GRAB AND WRITE LOOP
-    cout << "Start grabbing" << endl
-        << "Press any key to terminate" << endl;
-    while(true)
-    {
-        // wait for a new frame from camera and store it into 'frame'
-        cap.read(frame);
-        // check if we succeeded
-        if (frame.empty()) {
-            cerr << "ERROR! blank frame grabbed\n";
-            break;
-        }
-
-        show(frame);
-
-        //showGray(frame);
-
-        //showBGR(frame);
-
-        showFiltered(frame,false);
-
-        if (waitKey(5) >= 0)
-            break;
-    }
-    // the camera will be deinitialized automatically in VideoCapture destructor
-    return 0;
+void setupTrackbars(String windowName){
+  createTrackbar("Hue Low",windowName,&lowH,maxHue,onLowHueChange);
+  createTrackbar("Hue High",windowName,&highH,maxHue,onHighHueChange);
 }
