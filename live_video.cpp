@@ -7,11 +7,11 @@
 using namespace cv;
 using namespace std;
 
-//window titles
+// window titles
 const String filteredTitle = "Live (Filtered)";
 const String regularTitle = "Live";
 
-//trackbar titles
+// trackbar titles
 const String hueLowTitle = "Hue Low";
 const String hueHighTitle = "Hue High";
 const String satLowTitle = "Sat Low";
@@ -19,12 +19,12 @@ const String satHighTitle = "Sat High";
 const String valLowTitle = "Val Low";
 const String valHighTitle = "Val High";
 
-//maximum values for the sliders
+// maximum values for the sliders
 const int maxHue = 180;
 const int maxVal = 255;
 const int maxBlur = 50;
 
-//variables used to hold the values of the trackbars
+// variables used to hold the values of the trackbars
 int lowH, lowS, lowV = 0;
 int highH, highS, highV = 50;
 int blurStrength = 0;
@@ -82,8 +82,9 @@ int main() {
 }
 
 void show(Mat image) {
+    // apply gaussian blur to image
     GaussianBlur(image, image, Size(blurStrength * 2 + 1, blurStrength * 2 + 1), 0, 0);
-    imshow(regularTitle, image);
+    imshow(regularTitle, image); // display image
 }
 
 void showGray(Mat image) {
@@ -110,70 +111,80 @@ Mat morphed_img(Mat mask) {
 }
 
 Mat threshold_image(Mat img) {
-    Mat hsv(img.rows, img.cols, CV_8UC3);
-    cvtColor(img, hsv, CV_RGB2HSV);
-    Mat thresh(img.rows, img.cols, CV_8UC1);
-    Scalar high_HSV(lowH, lowS, lowV);
-    Scalar low_HSV(highH, highS, highV);
-    inRange(hsv, high_HSV, low_HSV, thresh);
+    Mat hsv(img.rows, img.cols, CV_8UC3);    // create Mat to hold HSV image
+    cvtColor(img, hsv, CV_RGB2HSV);          // convert image to HSV
+    Mat thresh(img.rows, img.cols, CV_8UC1); // create Mat to hold threshold results
+    Scalar lowHSV(lowH, lowS, lowV);         // define Scalar to hold lower limits for HSV filtering
+    Scalar highHSV(highH, highS, highV);     // define Scalar to hold upper limits for HSV filtering
+    inRange(hsv, lowHSV, highHSV, thresh);   // filter the image and put the results in thresh Mat
     return (thresh);
 }
 
 void showFiltered(Mat image, bool morph) {
-    Mat mask = threshold_image(image);
-    if(morph) {
-        Mat filtered = morphed_img(mask);
-        imshow(filteredTitle, filtered);
-    } else {
-        imshow(filteredTitle, mask);
+    Mat filtered = threshold_image(image);   // perform threshold filtering on the image
+    if(morph) {                              // if the morph parameter is true
+        Mat morphed = morphed_img(filtered); // morph the image
+        imshow(filteredTitle, morphed);      // show the morphed image
+    } else {                                 // otherwise
+        imshow(filteredTitle, filtered);     // just show the filtered image
     }
 }
 
+// Trackbar callbacks
+// these are called when the associated trackbars change.
+// their parameters aren't actually used but they're needed in order for OpenCV to recognize them as
+//  valid callback functions so don't remove them.
 void onLowHueChange(int newVal, void *userdata) {
-    if(highH < lowH) {
+    if(highH < lowH) { // if high slider is less than low slider
+                       // set the high slider to 1 above the low slider if possible
         setTrackbarPos(hueHighTitle, filteredTitle, min(lowH + 1, maxHue));
     }
 }
 
 void onHighHueChange(int newVal, void *userdata) {
-    if(lowH > highH) {
+    if(lowH > highH) { // if low slider is higher than low slider
+                       // set the low slider to 1 below the high slider if possible
         setTrackbarPos(hueLowTitle, filteredTitle, max(highH - 1, 0));
     }
 }
 
 void onLowSatChange(int newVal, void *userdata) {
-    if(highS < lowS) {
+    if(highS < lowS) { // if low slider is higher than low slider
+                       // set the low slider to 1 below the high slider if possible
         setTrackbarPos(satHighTitle, filteredTitle, min(lowS + 1, maxVal));
     }
 }
 
 void onHighSatChange(int newVal, void *userdata) {
-    if(lowS > highS) {
+    if(lowS > highS) { // if low slider is higher than low slider
+                       // set the low slider to 1 below the high slider if possible
         setTrackbarPos(satLowTitle, filteredTitle, max(highS - 1, 0));
     }
 }
 
 void onLowValChange(int newVal, void *userdata) {
-    if(highV < lowV) {
+    if(highV < lowV) { // if low slider is higher than low slider
+                       // set the low slider to 1 below the high slider if possible
         setTrackbarPos(valHighTitle, filteredTitle, min(lowV + 1, maxVal));
     }
 }
 
 void onHighValChange(int newVal, void *userdata) {
-    if(lowV > highV) {
+    if(lowV > highV) { // if low slider is higher than low slider
+                       // set the low slider to 1 below the high slider if possible
         setTrackbarPos(valLowTitle, filteredTitle, max(highV - 1, 0));
     }
 }
 
 void setupFilterTrackbars() {
-    createTrackbar(hueLowTitle, filteredTitle, &lowH, maxHue, onLowHueChange);
-    createTrackbar(hueHighTitle, filteredTitle, &highH, maxHue, onHighHueChange);
-    createTrackbar(satLowTitle, filteredTitle, &lowS, maxVal, onLowSatChange);
-    createTrackbar(satHighTitle, filteredTitle, &highS, maxVal, onHighSatChange);
-    createTrackbar(valLowTitle, filteredTitle, &lowV, maxVal, onLowValChange);
-    createTrackbar(valHighTitle, filteredTitle, &highV, maxVal, onHighValChange);
+    createTrackbar(hueLowTitle, filteredTitle, &lowH, maxHue, onLowHueChange);    // set up low hue trackbar
+    createTrackbar(hueHighTitle, filteredTitle, &highH, maxHue, onHighHueChange); // set up high hue trackbar
+    createTrackbar(satLowTitle, filteredTitle, &lowS, maxVal, onLowSatChange);    // set up low sat trackbar
+    createTrackbar(satHighTitle, filteredTitle, &highS, maxVal, onHighSatChange); // set up high sat trackbar
+    createTrackbar(valLowTitle, filteredTitle, &lowV, maxVal, onLowValChange);    // set up low val trackbar
+    createTrackbar(valHighTitle, filteredTitle, &highV, maxVal, onHighValChange); // set up high val trackbar
 }
 
 void setupMainTrackbars() {
-    createTrackbar("Blur", regularTitle, &blurStrength, maxBlur);
+    createTrackbar("Blur", regularTitle, &blurStrength, maxBlur); // set up blur trackbar
 }
