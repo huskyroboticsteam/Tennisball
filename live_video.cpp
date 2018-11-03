@@ -10,6 +10,13 @@ using namespace std;
 String filteredTitle = "Live (Filtered)";
 String regularTitle = "Live";
 
+String hueLowTitle = "Hue Low";
+String hueHighTitle = "Hue High";
+String satLowTitle = "Sat Low";
+String satHighTitle = "Sat High";
+String valLowTitle = "Val Low";
+String valHighTitle = "Val High";
+
 int lowH, lowS, lowV;
 int highH, highS, highV;
 int blurStrength=0;
@@ -130,35 +137,47 @@ void showFiltered(Mat image, bool morph){
 }
 
 void onLowHueChange(int newVal, void* userdata){
-  //printf("%d\n",lowH);
+  if(highH < lowH){
+    setTrackbarPos(hueHighTitle,filteredTitle,min(lowH+1,maxHue));
+  }
 }
 
 void onHighHueChange(int newVal, void* userdata){
-  
+  if(lowH > highH){
+    setTrackbarPos(hueLowTitle,filteredTitle,max(highH-1,0));
+  }
 }
 
 void onLowSatChange(int newVal, void* userdata){
-  
+  if(highS < lowS){
+    setTrackbarPos(satHighTitle,filteredTitle,min(lowS+1,maxVal));
+  }
 }
 
 void onHighSatChange(int newVal, void* userdata){
-  
+  if(lowS > highS){
+    setTrackbarPos(satLowTitle,filteredTitle,max(highS-1,0));
+  }
 }
 
 void onLowValChange(int newVal, void* userdata){
-  
+  if(highV < lowV){
+    setTrackbarPos(valHighTitle,filteredTitle,min(lowV+1,maxVal));
+  }
 }
 
 void onHighValChange(int newVal, void* userdata){
-  
+  if(lowV > highV){
+    setTrackbarPos(valLowTitle, filteredTitle, max(highV-1,0));
+  }
 }
 
 void setupTrackbars(String windowName){
-  createTrackbar("Hue Low",windowName,&lowH,maxHue,onLowHueChange);
-  createTrackbar("Hue High",windowName,&highH,maxHue,onHighHueChange);
-  createTrackbar("Sat Low",windowName,&lowS,maxVal,onLowSatChange);
-  createTrackbar("Sat High",windowName,&highS,maxVal,onHighSatChange);
-  createTrackbar("Val Low",windowName,&lowV,maxVal,onLowValChange);
-  createTrackbar("Val High",windowName,&highV,maxVal,onHighValChange);
+  createTrackbar(hueLowTitle,windowName,&lowH,maxHue,onLowHueChange);
+  createTrackbar(hueHighTitle,windowName,&highH,maxHue,onHighHueChange);
+  createTrackbar(satLowTitle,windowName,&lowS,maxVal,onLowSatChange);
+  createTrackbar(satHighTitle,windowName,&highS,maxVal,onHighSatChange);
+  createTrackbar(valLowTitle,windowName,&lowV,maxVal,onLowValChange);
+  createTrackbar(valHighTitle,windowName,&highV,maxVal,onHighValChange);
 }
 
