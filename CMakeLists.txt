@@ -15,5 +15,7 @@ find_package( OpenCV REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 #add the `live` executable (compiled from `live_video.cpp`)
 add_executable( live live_video.cpp )
+add_executable( still StillImageTesting.cpp )
 #link the OpenCV library
 target_link_libraries( live ${OpenCV_LIBS} )
+target_link_libraries( still ${OpenCV_LIBS} )
