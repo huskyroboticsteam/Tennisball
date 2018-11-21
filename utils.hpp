@@ -95,7 +95,7 @@ namespace util {
   void onLowHueChange(int newVal, void *userdata) {
     string *windowTitle = (string *)userdata;
     int highH = util::getHighHue(*windowTitle);
-    int lowH = util::getLowHue(*windowTitle);
+    int lowH = newVal;
     if(highH < lowH) { // if high slider is less than low slider
                        // set the high slider to 1 above the low slider if possible
       cv::setTrackbarPos(hueHighTitle, *windowTitle, std::min(lowH + 1, maxHue));
@@ -104,7 +104,7 @@ namespace util {
 
   void onHighHueChange(int newVal, void *userdata) {
     string *windowTitle = (string *)userdata;
-    int highH = util::getHighHue(*windowTitle);
+    int highH = newVal;
     int lowH = util::getLowHue(*windowTitle);
     if(lowH > highH) { // if low slider is higher than low slider
                        // set the low slider to 1 below the high slider if possible
@@ -114,7 +114,7 @@ namespace util {
 
   void onLowSatChange(int newVal, void *userdata) {
     string *windowTitle = (string *)userdata;
-    int lowS = util::getLowSat(*windowTitle);
+    int lowS = newVal;
     int highS = util::getHighSat(*windowTitle);
     if(highS < lowS) { // if low slider is higher than low slider
                        // set the low slider to 1 below the high slider if possible
@@ -125,7 +125,7 @@ namespace util {
   void onHighSatChange(int newVal, void *userdata) {
     string *windowTitle = (string *)userdata;
     int lowS = util::getLowSat(*windowTitle);
-    int highS = util::getHighSat(*windowTitle);
+    int highS = newVal;
     if(lowS > highS) { // if low slider is higher than low slider
                        // set the low slider to 1 below the high slider if possible
       cv::setTrackbarPos(satLowTitle, *windowTitle, std::max(highS - 1, 0));
@@ -134,7 +134,7 @@ namespace util {
 
   void onLowValChange(int newVal, void *userdata) {
     string *windowTitle = (string *)userdata;
-    int lowV = util::getLowVal(*windowTitle);
+    int lowV = newVal;
     int highV = util::getHighVal(*windowTitle);
     if(highV < lowV) { // if low slider is higher than low slider
                        // set the low slider to 1 below the high slider if possible
@@ -145,7 +145,7 @@ namespace util {
   void onHighValChange(int newVal, void *userdata) {
     string *windowTitle = (string *)userdata;
     int lowV = util::getLowVal(*windowTitle);
-    int highV = util::getHighVal(*windowTitle);
+    int highV = newVal;
     if(lowV > highV) { // if low slider is higher than low slider
                        // set the low slider to 1 below the high slider if possible
       cv::setTrackbarPos(valLowTitle, *windowTitle, std::max(highV - 1, 0));
@@ -161,5 +161,18 @@ namespace util {
     cv::createTrackbar(valHighTitle, windowTitle, NULL, maxVal, onHighValChange, &windowTitle); // set up high val trackbar
   }
 
+  std::vector<cv::Vec3f> findCircles(cv::Mat image) {
+    std::vector<cv::Vec3f> circles;
+    cv::HoughCircles(image, circles, cv::HOUGH_GRADIENT, 1, image.rows / 16, 200, 100, 0, 0);
+    return circles;
+  }
+
+  cv::Rect centerSquare(int x, int y, int r) {
+    int x1 = x - r;
+    int y1 = y - r;
+    int h = r * 2;
+    int w = r * 2;
+    return cv::Rect(x1, y1, w, h);
+  }
 
 } // namespace util
