@@ -31,6 +31,14 @@ int main(int argc, char **argv) {
   while(true) {
     imshow(mainTitle, image);
     Mat thresh = util::thresholdImage(image, util::getLowHSV(filterTitle), util::getHighHSV(filterTitle));
+
+    vector<Vec3f> circles = util::findCircles(thresh);
+    for(size_t i = 0; i<circles.size(); i++){
+      Vec3f c = circles[i];
+      cout << "Found circle at (" << c[0] << "," << c[1] << ") with radius " << c[2] << endl;
+      rectangle(image, util::centerSquare(c[0],c[1],c[2]), Scalar(255,0,0), 2);
+    }
+
     imshow(filterTitle, thresh);
 
     if(waitKey(5) >= 0) {
