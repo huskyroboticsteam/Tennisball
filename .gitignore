@@ -7,3 +7,4 @@ object_detection
 .clang-format
 .dir-locals.el
 compile_commands.json
+data/models/
