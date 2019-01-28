@@ -3,3 +3,7 @@ object_detection
 .dir-locals.el
 compile_commands.json
 data/models
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+.clang-format
