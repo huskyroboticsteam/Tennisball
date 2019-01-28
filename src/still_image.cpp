@@ -9,63 +9,53 @@ using namespace std;
 using namespace cv;
 
 int main() {
-  string graph_path = "./data/final_models/frozen_inference_graph.pb";
-  string graph_pbtxt = "./data/final_models/graph.pbtxt";
-  cv::dnn::Net network =
-      cv::dnn::readNetFromTensorflow(graph_path, graph_pbtxt);
+    string graphPath = "./data/final_models/frozen_inference_graph.pb";
+    string graphPbtxt = "./data/final_models/graph.pbtxt";
+    cv::dnn::Net network = cv::dnn::readNetFromTensorflow(graphPath, graphPbtxt);
 
-  string classNames[] = {"TennisBall"};
+    string classNames[] = { "", "TennisBall" };
 
-  string image_path = "./images/1.jpg";
-  cv::Mat frame = cv::imread(image_path);
+    string imagePath = "./images/1.jpg";
+    Mat frame = imread(imagePath);
 
-  network.setInput(cv::dnn::blobFromImage(frame, 1.0, cv::Size(300, 300),
-                                          cv::Scalar(), true, false));
-  cv::Mat output = network.forward();
+    network.setInput(cv::dnn::blobFromImage(frame, 1.0, Size(300, 300), Scalar(), true, false));
+    Mat output = network.forward();
 
-  cout << output.size << endl;
-  cv::Mat detectionMat(output.size[2], output.size[3], CV_32F,
-                       output.ptr<float>());
+    cout << output.size << endl;
+    Mat detectionMat(output.size[2], output.size[3], CV_32F, output.ptr<float>());
 
-  for (int i = 0; i < detectionMat.rows; i++) {
-    float confidence = detectionMat.at<float>(i, 2);
-    cout << "confidence: " << confidence << endl;
+    for(int i = 0; i < detectionMat.rows; i++) {
+        float confidence = detectionMat.at<float>(i, 2);
+        cout << "confidence: " << confidence << endl;
 
-    if (confidence > 0.2) {
-      size_t objectClass = (size_t)(detectionMat.at<float>(i, 1));
+        if(confidence > 0.2) {
+            int objectClass = static_cast<int>(detectionMat.at<float>(i, 1));
+            cout << "object class: " << objectClass << endl;
 
-      int xLeftBottom =
-          static_cast<int>(detectionMat.at<float>(i, 3) * frame.cols);
-      int yLeftBottom =
-          static_cast<int>(detectionMat.at<float>(i, 4) * frame.rows);
-      int xRightTop =
-          static_cast<int>(detectionMat.at<float>(i, 5) * frame.cols);
-      int yRightTop =
-          static_cast<int>(detectionMat.at<float>(i, 6) * frame.rows);
+            int left = static_cast<int>(detectionMat.at<float>(i, 3) * frame.cols);
+            int bottom = static_cast<int>(detectionMat.at<float>(i, 4) * frame.rows);
+            int right = static_cast<int>(detectionMat.at<float>(i, 5) * frame.cols);
+            int top = static_cast<int>(detectionMat.at<float>(i, 6) * frame.rows);
 
-      cout << "[" << xLeftBottom << ", " << xRightTop << "] x [" << yLeftBottom << ", " << yRightTop << "]" << endl;
+            cout << "[" << left << ", " << right << "] x [" << bottom << ", " << top << "]" << endl;
 
-      ostringstream ss;
-      ss << confidence*100 << "%";
-      string conf(ss.str());
+            ostringstream ss;
+            ss << confidence * 100 << "%";
+            string conf(ss.str());
 
-      cv::Rect object((int)xLeftBottom, (int)yLeftBottom,
-                      (int)(xRightTop - xLeftBottom),
-                      (int)(yRightTop - yLeftBottom));
+            Rect object((int)left, (int)bottom, (int)(right - left), (int)(top - bottom));
 
-      rectangle(frame, object, Scalar(0, 255, 0), 2);
-      String label = classNames[objectClass] + ": " + conf;
-      int baseLine = 0;
-      Size labelSize =
-          getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-      rectangle(frame,
-                Rect(Point(xLeftBottom, yLeftBottom - labelSize.height),
-                     Size(labelSize.width, labelSize.height + baseLine)),
-                Scalar(0, 255, 0), CV_FILLED);
-      putText(frame, label, Point(xLeftBottom, yLeftBottom),
-              FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 0, 0));
+            rectangle(frame, object, Scalar(0, 255, 0), 2);
+            String label = classNames[objectClass] + ": " + conf;
+            int baseLine = 0;
+            Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+            rectangle(frame,
+                      Rect(Point(left, bottom - labelSize.height),
+                           Size(labelSize.width, labelSize.height + baseLine)),
+                      Scalar(0, 255, 0), CV_FILLED);
+            putText(frame, label, Point(left, bottom), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 0, 0));
+        }
     }
-  }
-  imshow("image", frame);
-  waitKey(0);
+    imshow("image", frame);
+    waitKey(0);
 }
