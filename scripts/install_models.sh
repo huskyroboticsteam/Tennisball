@@ -1,4 +1,9 @@
 #!/bin/bash
+########################################################
+### NOTE: THIS SCRIPT SHOULD BE RUN FROM THE PROJECT ###
+###     DIRECTORY, **NOT** THE SCRIPTS DIRECTORY!    ###
+########################################################
+
 dir=`pwd`
 scripts_dir=$dir"/scripts"
 cd /tmp

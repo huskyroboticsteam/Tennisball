@@ -1,4 +1,9 @@
 #!/bin/bash
+########################################################
+### NOTE: THIS SCRIPT SHOULD BE RUN FROM THE PROJECT ###
+###     DIRECTORY, **NOT** THE SCRIPTS DIRECTORY!    ###
+########################################################
+
 PIPELINE_CONFIG_PATH=./training/pipeline.config
 MODEL_DIR=./data/models/
 NUM_TRAIN_STEPS=50000
