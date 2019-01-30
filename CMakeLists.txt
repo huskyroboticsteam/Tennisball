@@ -13,9 +13,17 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ./bin)
 find_package( OpenCV REQUIRED )
 #make sure the OpenCV library directory is included when compiling
 include_directories( ${OpenCV_INCLUDE_DIRS} )
-#add the `live` executable (compiled from `live_video.cpp`)
-#add_executable( live live_video.cpp )
-add_executable( still src/still_image.cpp )
+
+#Add the still executable
+add_executable( still src/still_image.cpp)
+
+#add sources for still executable
+target_sources( still
+  PUBLIC
+  src/still_image.cpp
+  src/detector.cpp
+  src/detector.hpp
+)
 #link the OpenCV library
 #target_link_libraries( live ${OpenCV_LIBS} )
 target_link_libraries( still ${OpenCV_LIBS} )
