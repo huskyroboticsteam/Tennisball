@@ -17,13 +17,25 @@ include_directories( ${OpenCV_INCLUDE_DIRS} )
 #Add the still executable
 add_executable( still src/still_image.cpp)
 
+#Add the live executable
+add_executable( live src/live_video.cpp)
+
 #add sources for still executable
 target_sources( still
   PUBLIC
   src/still_image.cpp
   src/detector.cpp
   src/detector.hpp
-)
+  )
+
+#add sources for live executable
+target_sources( live
+  PUBLIC
+  src/live_video.cpp
+  src/detector.cpp
+  src/detector.hpp
+  )
+
 #link the OpenCV library
-#target_link_libraries( live ${OpenCV_LIBS} )
+target_link_libraries( live ${OpenCV_LIBS} )
 target_link_libraries( still ${OpenCV_LIBS} )

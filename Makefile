@@ -56,17 +56,6 @@ CMAKE_BINARY_DIR = /home/evan/Sync/code/robotics/tennisball
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -77,6 +66,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -123,6 +123,19 @@ still/fast:
 	$(MAKE) -f CMakeFiles/still.dir/build.make CMakeFiles/still.dir/build
 .PHONY : still/fast
 
+#=============================================================================
+# Target rules for targets named live
+
+# Build rule for target.
+live: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 live
+.PHONY : live
+
+# fast build rule for target.
+live/fast:
+	$(MAKE) -f CMakeFiles/live.dir/build.make CMakeFiles/live.dir/build
+.PHONY : live/fast
+
 src/detector.o: src/detector.cpp.o
 
 .PHONY : src/detector.o
@@ -130,6 +143,7 @@ src/detector.o: src/detector.cpp.o
 # target to build an object file
 src/detector.cpp.o:
 	$(MAKE) -f CMakeFiles/still.dir/build.make CMakeFiles/still.dir/src/detector.cpp.o
+	$(MAKE) -f CMakeFiles/live.dir/build.make CMakeFiles/live.dir/src/detector.cpp.o
 .PHONY : src/detector.cpp.o
 
 src/detector.i: src/detector.cpp.i
@@ -139,6 +153,7 @@ src/detector.i: src/detector.cpp.i
 # target to preprocess a source file
 src/detector.cpp.i:
 	$(MAKE) -f CMakeFiles/still.dir/build.make CMakeFiles/still.dir/src/detector.cpp.i
+	$(MAKE) -f CMakeFiles/live.dir/build.make CMakeFiles/live.dir/src/detector.cpp.i
 .PHONY : src/detector.cpp.i
 
 src/detector.s: src/detector.cpp.s
@@ -148,7 +163,35 @@ src/detector.s: src/detector.cpp.s
 # target to generate assembly for a file
 src/detector.cpp.s:
 	$(MAKE) -f CMakeFiles/still.dir/build.make CMakeFiles/still.dir/src/detector.cpp.s
+	$(MAKE) -f CMakeFiles/live.dir/build.make CMakeFiles/live.dir/src/detector.cpp.s
 .PHONY : src/detector.cpp.s
+
+src/live_video.o: src/live_video.cpp.o
+
+.PHONY : src/live_video.o
+
+# target to build an object file
+src/live_video.cpp.o:
+	$(MAKE) -f CMakeFiles/live.dir/build.make CMakeFiles/live.dir/src/live_video.cpp.o
+.PHONY : src/live_video.cpp.o
+
+src/live_video.i: src/live_video.cpp.i
+
+.PHONY : src/live_video.i
+
+# target to preprocess a source file
+src/live_video.cpp.i:
+	$(MAKE) -f CMakeFiles/live.dir/build.make CMakeFiles/live.dir/src/live_video.cpp.i
+.PHONY : src/live_video.cpp.i
+
+src/live_video.s: src/live_video.cpp.s
+
+.PHONY : src/live_video.s
+
+# target to generate assembly for a file
+src/live_video.cpp.s:
+	$(MAKE) -f CMakeFiles/live.dir/build.make CMakeFiles/live.dir/src/live_video.cpp.s
+.PHONY : src/live_video.cpp.s
 
 src/still_image.o: src/still_image.cpp.o
 
@@ -183,12 +226,16 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
-	@echo "... still"
 	@echo "... edit_cache"
+	@echo "... still"
+	@echo "... rebuild_cache"
+	@echo "... live"
 	@echo "... src/detector.o"
 	@echo "... src/detector.i"
 	@echo "... src/detector.s"
+	@echo "... src/live_video.o"
+	@echo "... src/live_video.i"
+	@echo "... src/live_video.s"
 	@echo "... src/still_image.o"
 	@echo "... src/still_image.i"
 	@echo "... src/still_image.s"
