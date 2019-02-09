@@ -16,7 +16,7 @@ int main() {
     Mat frame; // define a Mat to be used for the frames coming from the camera
 
     VideoCapture cap;        // Initialize VideoCapture, this will be used for the camera
-    int deviceID = 0;        // 0 = open default camera
+    int deviceID = 1;        // 0 = open default camera
     int apiID = cv::CAP_ANY; // 0 = autodetect default API
 
     cap.open(deviceID + apiID); // open selected camera using selected API
@@ -42,8 +42,8 @@ int main() {
         }
 
         vector<tb::Detection> detections = detector.performDetection(frame);
-      
         for(tb::Detection current : detections){
+            cout << "confidence: " << current.getConfidencePct() << "%" << endl;
             rectangle(frame, current.getBBoxRect(), Scalar(0, 255, 0), 2);
         }
 
