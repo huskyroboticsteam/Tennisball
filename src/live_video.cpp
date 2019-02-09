@@ -16,7 +16,7 @@ int main() {
     Mat frame; // define a Mat to be used for the frames coming from the camera
 
     VideoCapture cap;        // Initialize VideoCapture, this will be used for the camera
-    int deviceID = 1;        // 0 = open default camera
+    int deviceID = 0;        // 0 = open default camera
     int apiID = cv::CAP_ANY; // 0 = autodetect default API
 
     cap.open(deviceID + apiID); // open selected camera using selected API
@@ -41,13 +41,16 @@ int main() {
             break;
         }
 
-        vector<tb::Detection> detections = detector.performDetection(frame);
+        Mat blur;
+        GaussianBlur(frame, blur, Size(5,5), 0);
+
+        vector<tb::Detection> detections = detector.performDetection(blur);
         for(tb::Detection current : detections){
             cout << "confidence: " << current.getConfidencePct() << "%" << endl;
-            rectangle(frame, current.getBBoxRect(), Scalar(0, 255, 0), 2);
+            rectangle(blur, current.getBBoxRect(), Scalar(0, 255, 0), 2);
         }
 
-        imshow(WINDOW_TITLE, frame);
+        imshow(WINDOW_TITLE, blur);
 
         if(waitKey(5) >= 0) // wait 5ms for a key to be pressed
             break;          // if key was pressed, break the while loop
