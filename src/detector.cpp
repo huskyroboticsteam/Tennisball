@@ -44,8 +44,6 @@ Detector::Detector(std::string binaryGraphPath, std::string graphPbtxtPath) {
 /*
  *  Detection class
  */
-
-
 Detection::Detection(int left, int right, int top, int bottom, double confidence) {
     Detection::left = left;
     Detection::right = right;
@@ -90,7 +88,6 @@ cv::Rect2i Detection::getBBoxRect() {
     cv::Rect2i rect(left, top, getBBoxWidth(), getBBoxHeight());
     return rect;
 }
-
 cv::Point2f Detection::getBBoxCenter() {
     float centerX = getBBoxWidth() / 2;
     float centerY = getBBoxHeight() / 2;

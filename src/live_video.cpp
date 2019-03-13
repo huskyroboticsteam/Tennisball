@@ -12,11 +12,18 @@ const string WINDOW_TITLE = "Detection";
 const string GRAPH_PATH = "./data/final_models/frozen_inference_graph.pb";
 const string GRAPH_PBTXT = "./data/final_models/graph.pbtxt";
 
-int main() {
+int main(int argc, char** argv) {
+    int deviceID = 0; // 0 = open default camera
+    if(argc > 1) {
+        // second argument will be the device id
+        string device = argv[1];
+        deviceID = stoi(device);
+    }
+
     Mat frame; // define a Mat to be used for the frames coming from the camera
 
-    VideoCapture cap;        // Initialize VideoCapture, this will be used for the camera
-    int deviceID = 0;        // 0 = open default camera
+    VideoCapture cap; // Initialize VideoCapture, this will be used for the camera
+
     int apiID = cv::CAP_ANY; // 0 = autodetect default API
 
     cap.open(deviceID + apiID); // open selected camera using selected API
@@ -29,9 +36,7 @@ int main() {
     tb::Detector detector(GRAPH_PATH, GRAPH_PBTXT);
 
     //--- GRAB AND WRITE LOOP
-    cout
-    << "Start grabbing" << endl
-    << "Press any key to terminate" << endl;
+    cout << "Start grabbing" << endl << "Press any key to terminate" << endl;
     while(true) {
 
         cap.read(frame);  // wait for a new frame from camera and store it into 'frame'
@@ -42,10 +47,10 @@ int main() {
         }
 
         Mat blur;
-        GaussianBlur(frame, blur, Size(5,5), 0);
+        GaussianBlur(frame, blur, Size(5, 5), 0);
 
         vector<tb::Detection> detections = detector.performDetection(blur);
-        for(tb::Detection current : detections){
+        for(tb::Detection current : detections) {
             cout << "confidence: " << current.getConfidencePct() << "%" << endl;
             rectangle(blur, current.getBBoxRect(), Scalar(0, 255, 0), 2);
         }
