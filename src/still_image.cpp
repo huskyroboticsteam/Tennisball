@@ -9,13 +9,18 @@
 using namespace std;
 using namespace cv;
 
-int main() {
+int main(int argc, char** argv) {
     std::string graphPath = "./data/final_models/frozen_inference_graph.pb";
     std::string graphPbtxt = "./data/final_models/graph.pbtxt";
 
     tb::Detector det (graphPath, graphPbtxt);
 
     string imagePath = "./images/1.jpg";
+	
+	if(argc > 1){
+	  imagePath = argv[1];
+	}
+
     Mat frame = imread(imagePath);
 
     vector<tb::Detection> detections = det.performDetection(frame);
