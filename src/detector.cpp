@@ -9,7 +9,7 @@ using namespace tb;
 std::vector<Detection> Detector::performDetection(cv::Mat image){
     return performDetection(image, DEFAULT_DETECTION_THRESHOLD);
 }
-std::vector<Detection> Detector::performDetection(cv::Mat image, double confidenceThreshold) {
+std::vector<Detection> Detector::performDetection(cv::Mat image, float confidenceThreshold) {
     cv::Mat blob = cv::dnn::blobFromImage(image, 1.0, cv::Size(300, 300), cv::Scalar(), true, false);
     network.setInput(blob);
 
@@ -44,7 +44,7 @@ Detector::Detector(std::string binaryGraphPath, std::string graphPbtxtPath) {
 /*
  *  Detection class
  */
-Detection::Detection(int left, int right, int top, int bottom, double confidence) {
+Detection::Detection(int left, int right, int top, int bottom, float confidence) {
     Detection::left = left;
     Detection::right = right;
     Detection::top = top;
@@ -52,11 +52,11 @@ Detection::Detection(int left, int right, int top, int bottom, double confidence
     Detection::confidence = confidence;
 }
 
-double Detection::getConfidence() {
+float Detection::getConfidence() {
     return confidence;
 }
 
-double Detection::getConfidencePct() {
+float Detection::getConfidencePct() {
     return confidence * 100;
 }
 

@@ -13,13 +13,13 @@ namespace tb {
         int right;
         int top;
         int bottom;
-        double confidence;
+        float confidence;
     public:
-        Detection(int left, int right, int top, int bottom, double confidence); 
+        Detection(int left, int right, int top, int bottom, float confidence); 
 
     public:
-        double getConfidence();
-        double getConfidencePct();
+        float getConfidence();
+        float getConfidencePct();
         cv::Rect2i getBBoxRect();
         cv::Point2f getBBoxCenter();
         int getBBoxLeft();
@@ -36,7 +36,7 @@ namespace tb {
 
       public:
         std::vector<Detection> performDetection(cv::Mat image);
-        std::vector<Detection> performDetection(cv::Mat image, double confidenceThreshold);
+        std::vector<Detection> performDetection(cv::Mat image, float confidenceThreshold);
         Detector(std::string binaryGraphPath, std::string graphPbtxtPath);
     };
 } // namespace tb
