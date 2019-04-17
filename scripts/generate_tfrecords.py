@@ -19,10 +19,13 @@ def create_tf_example(row):
     image = Image.open(encoded_image_io)
     width, height = image.size
 
-    xmins = [(int(row['xmin']) / width)]
-    xmaxs = [(int(row['xmax']) / width)]
-    ymins = [(int(row['ymin']) / height)]
-    ymaxs = [(int(row['ymax']) / height)]
+    xmins = [(float(row['xmin']) / width)]
+    xmaxs = [(float(row['xmax']) / width)]
+    ymins = [(float(row['ymin']) / height)]
+    ymaxs = [(float(row['ymax']) / height)]
+    print("  Bounding box: [{}, {}] x [{}, {}], encoded: [{}, {}] x [{}, {}]"
+          .format(row['xmin'], row['ymin'], row['xmax'], row['ymax'],
+                  xmins, ymins, xmaxs, ymaxs))
     classes_text = [row['class'].encode('utf8')]
     classes = [1]
 
