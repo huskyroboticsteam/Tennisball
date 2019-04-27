@@ -6,7 +6,7 @@ const std::string classnames[] = { "", "TennisBall" };
 
 using namespace tb;
 
-std::vector<Detection> Detector::performDetection(cv::Mat image){
+std::vector<Detection> Detector::performDetection(cv::Mat image) {
     return performDetection(image, DEFAULT_DETECTION_THRESHOLD);
 }
 std::vector<Detection> Detector::performDetection(cv::Mat image, float confidenceThreshold) {
@@ -29,7 +29,7 @@ std::vector<Detection> Detector::performDetection(cv::Mat image, float confidenc
                 int right = static_cast<int>(detectionMat.at<float>(i, 5) * image.cols);
                 int bottom = static_cast<int>(detectionMat.at<float>(i, 6) * image.rows);
 
-                Detection detection (left, right, top, bottom, confidence);
+                Detection detection(left, right, top, bottom, confidence);
                 detections.push_back(detection);
             }
         }
@@ -88,9 +88,10 @@ cv::Rect2i Detection::getBBoxRect() {
     cv::Rect2i rect(left, top, getBBoxWidth(), getBBoxHeight());
     return rect;
 }
+
 cv::Point2f Detection::getBBoxCenter() {
-    float centerX = getBBoxWidth() / 2;
-    float centerY = getBBoxHeight() / 2;
+    float centerX = (getBBoxWidth() / 2) + getBBoxLeft();
+    float centerY = (getBBoxHeight() / 2) + getBBoxTop();
     cv::Point2f center(centerX, centerY);
     return center;
 }
