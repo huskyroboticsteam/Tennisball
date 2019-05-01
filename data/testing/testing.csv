@@ -60,3 +60,6 @@ index,filename,width,height,class,bbox_count,xmin0,xmax0,ymin0,ymax0
 58,58.jpg,960,1280,TennisBall,1,363,583,517,730
 59,59.jpg,960,1280,TennisBall,1,410,620,544,762
 60,60.jpg,960,1280,TennisBall,1,356,636,601,898
+61,61.jpg,960,1280,TennisBall,1,266,485,563,782
+62,62.jpg,960,1280,TennisBall,1,364,619,300,561
+63,63.jpg,960,1280,TennisBall,1,414,631,494,715
