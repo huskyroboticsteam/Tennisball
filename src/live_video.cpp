@@ -12,6 +12,10 @@ const string WINDOW_TITLE = "Detection";
 const string GRAPH_PATH = "./data/final_models/frozen_inference_graph.pb";
 const string GRAPH_PBTXT = "./data/final_models/graph.pbtxt";
 
+//set these as high as possible; the camera will be set to its maximum supported resolution
+const int FRAME_WIDTH = 4000;
+const int FRAME_HEIGHT = 4000;
+
 int main(int argc, char** argv) {
     int deviceID = 0; // 0 = open default camera
     if(argc > 1) {
@@ -26,12 +30,19 @@ int main(int argc, char** argv) {
 
     int apiID = cv::CAP_ANY; // 0 = autodetect default API
 
-    cap.open(deviceID + apiID); // open selected camera using selected API
+	cout << "Opening camera..." << endl;
+	cap.open(deviceID + apiID); // open selected camera using selected API
     if(!cap.isOpened())         // check if we succeeded
     {
         cerr << "ERROR! Unable to open camera\n"; // if not, print an error
         return -1;                                // and exit the program
     }
+
+	cout << "Setting frame dimensions to " << FRAME_WIDTH << "x" << FRAME_HEIGHT << endl;
+    cap.set(CV_CAP_PROP_FRAME_WIDTH, FRAME_WIDTH);
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT);
+    cout << "Frame dimensions set to " << cap.get(CV_CAP_PROP_FRAME_WIDTH) << "x"
+         << cap.get(CV_CAP_PROP_FRAME_HEIGHT) << endl;
 
     tb::Detector detector(GRAPH_PATH, GRAPH_PBTXT);
 
@@ -47,9 +58,9 @@ int main(int argc, char** argv) {
         }
 
         Mat blur;
-        GaussianBlur(frame, blur, Size(5, 5), 0);
+        GaussianBlur(frame, blur, Size(3, 3), 0);
 
-        vector<tb::Detection> detections = detector.performDetection(blur);
+        vector<tb::Detection> detections = detector.performDetection(blur, 0.8);
         for(tb::Detection current : detections) {
             cout << "confidence: " << current.getConfidencePct() << "%" << endl;
             rectangle(blur, current.getBBoxRect(), Scalar(0, 255, 0), 2);
