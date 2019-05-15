@@ -12,6 +12,13 @@ const string WINDOW_TITLE = "Detection";
 const string GRAPH_PATH = "./data/final_models/frozen_inference_graph.pb";
 const string GRAPH_PBTXT = "./data/final_models/graph.pbtxt";
 
+//set these as high as possible; the camera will be set to its maximum supported resolution
+const int FRAME_WIDTH = 1280;
+const int FRAME_HEIGHT = 720;
+
+const bool USE_BLUR = true;
+const int BLUR_SIZE = 1;
+
 int main(int argc, char** argv) {
     int deviceID = 0; // 0 = open default camera
     if(argc > 1) {
@@ -26,12 +33,19 @@ int main(int argc, char** argv) {
 
     int apiID = cv::CAP_ANY; // 0 = autodetect default API
 
-    cap.open(deviceID + apiID); // open selected camera using selected API
+	cout << "Opening camera..." << endl;
+	cap.open(deviceID + apiID); // open selected camera using selected API
     if(!cap.isOpened())         // check if we succeeded
     {
         cerr << "ERROR! Unable to open camera\n"; // if not, print an error
         return -1;                                // and exit the program
     }
+
+	cout << "Setting frame dimensions to " << FRAME_WIDTH << "x" << FRAME_HEIGHT << endl;
+    cap.set(CV_CAP_PROP_FRAME_WIDTH, FRAME_WIDTH);
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT);
+    cout << "Frame dimensions set to " << cap.get(CV_CAP_PROP_FRAME_WIDTH) << "x"
+         << cap.get(CV_CAP_PROP_FRAME_HEIGHT) << endl;
 
     tb::Detector detector(GRAPH_PATH, GRAPH_PBTXT);
 
@@ -46,16 +60,25 @@ int main(int argc, char** argv) {
             break;
         }
 
-        Mat blur;
-        GaussianBlur(frame, blur, Size(5, 5), 0);
-
-        vector<tb::Detection> detections = detector.performDetection(blur);
-        for(tb::Detection current : detections) {
-            cout << "confidence: " << current.getConfidencePct() << "%" << endl;
-            rectangle(blur, current.getBBoxRect(), Scalar(0, 255, 0), 2);
+        if(USE_BLUR) {
+		  GaussianBlur(frame, frame, Size(BLUR_SIZE, BLUR_SIZE), 0);
         }
 
-        imshow(WINDOW_TITLE, blur);
+		frame.convertTo(frame, -1, 0.7, 0.9);
+
+        vector<tb::Detection> detections = detector.performDetection(frame, 0.8);
+		int i = 0;
+        for(tb::Detection current : detections) {
+		  cout << "(#" << i << " confidence: " << current.getConfidencePct() << "%) ";
+            rectangle(frame, current.getBBoxRect(), Scalar(0, 255, 0), 2);
+			drawMarker(frame, current.getBBoxCenter(), Scalar(0, 0, 255), MARKER_CROSS, 20, 2);
+			i++;
+        }
+		if(i>0){
+		  cout << endl;
+		}
+
+        imshow(WINDOW_TITLE, frame);
 
         if(waitKey(5) >= 0) // wait 5ms for a key to be pressed
             break;          // if key was pressed, break the while loop
