@@ -1,17 +1,17 @@
 # Tennisball
 ## Code for tennis ball detection (Work in progress)
  This repo contains the tennis ball detection dataset and code. A bit about this repository:
--`src` contains source code files. *Please note that `live_video.cpp` and `still_image.cpp`
+- `src` contains source code files. *Please note that `live_video.cpp` and `still_image.cpp`
    are demo programs for testing the models.* The only files you should really need for
    integrating this code are `detector.hpp` and `detector.cpp`.
--`data` contains the training and testing datasets and the final exported models. Please note
+- `data` contains the training and testing datasets and the final exported models. Please note
    that all `*_shuffled.csv` and `*.tfrecord` files are automatically generated; you should not
    need to do anything with them.
--`data/training` contains the training dataset, including the CSV with bounding boxes and the
+- `data/training` contains the training dataset, including the CSV with bounding boxes and the
    TFRecord files used during training.
--`data/testing` contains the testing dataset, including the CSV with bounding boxes and the
+- `data/testing` contains the testing dataset, including the CSV with bounding boxes and the
     TFRecord files used during evaluation.
--`data/final_models` contains the exported neural network in both binary and plain text
+- `data/final_models` contains the exported neural network in both binary and plain text
 format. You will need both `frozen_inference_graph.pb` and `graph.pbtxt` in this directory to
 use the detector.
 -`images` contains the photos used in the dataset.
