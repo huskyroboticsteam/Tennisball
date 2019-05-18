@@ -1,10 +1,13 @@
-import csv, argparse, io, os
+import csv
+import argparse
+import io
+import os
 import tensorflow as tf
 from PIL import Image
 from object_detection.utils import dataset_util
 
 csv_filename = "./data/training/training.csv"
-image_directory = "./images/"
+image_dir = "./images/"
 output_file = "./data/training/train.tfrecord"
 
 def create_tf_example(row):
@@ -19,13 +22,24 @@ def create_tf_example(row):
     image = Image.open(encoded_image_io)
     width, height = image.size
 
-    xmins = [(float(row['xmin']) / width)]
-    xmaxs = [(float(row['xmax']) / width)]
-    ymins = [(float(row['ymin']) / height)]
-    ymaxs = [(float(row['ymax']) / height)]
-    print("  Bounding box: [{}, {}] x [{}, {}], encoded: [{}, {}] x [{}, {}]"
-          .format(row['xmin'], row['ymin'], row['xmax'], row['ymax'],
-                  xmins, ymins, xmaxs, ymaxs))
+    xmins = []
+    xmaxs = []
+    ymins = []
+    ymaxs = []
+
+    bbox_count = int(row['bbox_count'])
+    for i in range(0, bbox_count):
+        xmin = row['xmin{}'.format(i)]
+        xmax = row['xmax{}'.format(i)]
+        ymin = row['ymin{}'.format(i)]
+        ymax = row['ymax{}'.format(i)]
+        xmins.append(float(xmin) / width)
+        xmaxs.append(float(xmax) / width)
+        ymins.append(float(ymin) / height)
+        ymaxs.append(float(ymax) / height)
+        print("  Bounding box #{}: [{}, {}] x [{}, {}], encoded: [{}, {}] x [{}, {}]"
+              .format(i, xmin, ymin, xmax, ymax, xmins[i], ymins[i], xmaxs[i], ymaxs[i]))
+
     classes_text = [row['class'].encode('utf8')]
     classes = [1]
 
@@ -45,11 +59,15 @@ def create_tf_example(row):
     }))
     return tf_example
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("Generates TFRecord files for a dataset.")
-    parser.add_argument("-f","--file", nargs='?', const=csv_filename, default=csv_filename, help="The CSV file to use, if not the default one ("+csv_filename+")")
-    parser.add_argument('-d',"--dir", nargs="?", const=image_directory, default=image_directory, help="The directory containing your images, if not the default one ("+image_directory+")")
-    parser.add_argument('-o',"--output", nargs="?", const=output_file, default=output_file, help="The TFRecord file to output to, if not the default one ("+output_file+")")
+    parser.add_argument("-f","--file", nargs='?', const=csv_filename, default=csv_filename,
+        help="The CSV file to use, if not the default one ("+csv_filename+")")
+    parser.add_argument('-d',"--dir", nargs="?", const=image_dir, default=image_dir,
+        help="The directory containing your images, if not the default one ("+image_dir+")")
+    parser.add_argument('-o',"--output", nargs="?", const=output_file, default=output_file,
+        help="The TFRecord file to output to, if not the default one ("+output_file+")")
     arg = parser.parse_args()
     csv_filename = arg.file
     image_directory = arg.dir

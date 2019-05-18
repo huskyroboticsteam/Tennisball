@@ -14,6 +14,8 @@ find_package( OpenCV REQUIRED )
 #make sure the OpenCV library directory is included when compiling
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 
+add_compile_options(-std=gnu++17)
+
 #Add the still executable
 add_executable( still src/still_image.cpp)
 

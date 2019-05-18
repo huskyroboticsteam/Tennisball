@@ -4,6 +4,8 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/videoio.hpp>
+#include <stdlib.h>
+#include "argparse.hpp"
 
 using namespace cv;
 using namespace std;
@@ -13,19 +15,49 @@ const string GRAPH_PATH = "./data/final_models/frozen_inference_graph.pb";
 const string GRAPH_PBTXT = "./data/final_models/graph.pbtxt";
 
 //set these as high as possible; the camera will be set to its maximum supported resolution
-const int FRAME_WIDTH = 1280;
-const int FRAME_HEIGHT = 720;
+const int DEFAULT_FRAME_WIDTH = 640;
+const int DEFAULT_FRAME_HEIGHT = 480;
 
-const bool USE_BLUR = true;
-const int BLUR_SIZE = 1;
 
 int main(int argc, char** argv) {
-    int deviceID = 0; // 0 = open default camera
-    if(argc > 1) {
-        // second argument will be the device id
-        string device = argv[1];
-        deviceID = stoi(device);
-    }
+
+  argparse::ArgumentParser program("live");
+  program.add_argument("-fw")
+	.help("frame width")
+	.action([](const string& value) { return stoi(value); })
+	.default_value(640);
+
+  program.add_argument("-fh")
+	.help("frame height")
+	.action([](const string& value) {return stoi(value);})
+	.default_value(480);
+
+  program.add_argument("-c")
+	.help("camera device id")
+	.action([](const string& value) {return stoi(value);})
+	.default_value(0);
+
+  program.add_argument("-b")
+	.help("blur size")
+	.action([](const string& value) {return stoi(value);})
+	.default_value(0);
+
+    program.add_argument("-conf")
+	.help("minimum confidence threshold")
+	  .action([](const string& value) {return atof(value.c_str());})
+	.default_value(0.2f);
+
+  program.parse_args(argc, argv);
+
+  int deviceID = program.get<int>("-c"); // 0 = open default camera
+  //   if(argc > 1) {
+  //         // second argument will be the device id
+  //         string device = argv[1];
+  //         deviceID = stoi(device);
+  //     }
+
+	int frameWidth = program.get<int>("-fw");
+	int frameHeight = program.get<int>("-fh");
 
     Mat frame; // define a Mat to be used for the frames coming from the camera
 
@@ -41,14 +73,17 @@ int main(int argc, char** argv) {
         return -1;                                // and exit the program
     }
 
-	cout << "Setting frame dimensions to " << FRAME_WIDTH << "x" << FRAME_HEIGHT << endl;
-    cap.set(CV_CAP_PROP_FRAME_WIDTH, FRAME_WIDTH);
-    cap.set(CV_CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT);
+	cout << "Setting frame dimensions to " << frameWidth << "x" << frameHeight << endl;
+    cap.set(CV_CAP_PROP_FRAME_WIDTH, frameWidth);
+    cap.set(CV_CAP_PROP_FRAME_HEIGHT, frameHeight);
+
     cout << "Frame dimensions set to " << cap.get(CV_CAP_PROP_FRAME_WIDTH) << "x"
          << cap.get(CV_CAP_PROP_FRAME_HEIGHT) << endl;
 
     tb::Detector detector(GRAPH_PATH, GRAPH_PBTXT);
 
+	double confThreshold = program.get<double>("-conf");
+	
     //--- GRAB AND WRITE LOOP
     cout << "Start grabbing" << endl << "Press any key to terminate" << endl;
     while(true) {
@@ -60,13 +95,11 @@ int main(int argc, char** argv) {
             break;
         }
 
-        if(USE_BLUR) {
-		  GaussianBlur(frame, frame, Size(BLUR_SIZE, BLUR_SIZE), 0);
-        }
+        Mat blur;
+		int blurSize = program.get<int>("-b");
+        GaussianBlur(frame, blur, Size(blurSize, blurSize), 0);
 
-		frame.convertTo(frame, -1, 0.7, 0.9);
-
-        vector<tb::Detection> detections = detector.performDetection(frame, 0.8);
+        vector<tb::Detection> detections = detector.performDetection(blur, 0.8);
 		int i = 0;
         for(tb::Detection current : detections) {
 		  cout << "(#" << i << " confidence: " << current.getConfidencePct() << "%) ";
